@@ -4,8 +4,7 @@ An end-to-end, event-driven serverless web application that serves cloud computi
 
 ## 🏗️ Architecture Overview
 
-![Architecture Diagram](./assets/architecture.png)
-*(Insert your architecture diagram here)*
+![Architecture Diagram](./architecture/serverless_genai_cloud_facts_architecture.jpeg)
 
 ### System Flow
 1. **Static Hosting:** Users access the web interface hosted securely via **AWS Amplify** on a global CDN.
