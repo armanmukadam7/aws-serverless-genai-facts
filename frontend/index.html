@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Fun Facts Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        .fact-box {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fact-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+
+        .loading {
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tech-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .fact-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="title">☁️ Cloud Fun Facts</h1>
+        <p class="subtitle">Discover amazing facts about cloud computing!</p>
+
+        <div class="fact-box">
+            <p class="fact-text" id="factText" aria-live="polite">
+                Click the button below to get a fun cloud fact!
+            </p>
+        </div>
+
+        <button class="generate-btn" id="generateBtn">
+            Generate Fun Fact
+        </button>
+
+        <div class="tech-info">
+            Powered by AWS Lambda + API Gateway + DynamoDB + Bedrock AI
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const API_URL = 'https://v5zrxervgl.execute-api.us-east-1.amazonaws.com/funfact';
+            const FETCH_TIMEOUT_MS = 10000;
+
+            const btn = document.getElementById('generateBtn');
+            const factText = document.getElementById('factText');
+
+            function setLoading() {
+                btn.disabled = true;
+                btn.textContent = 'Loading...';
+                factText.textContent = 'Getting your fact...';
+                factText.className = 'fact-text loading';
+            }
+
+            function setFact(fact) {
+                factText.textContent = fact;
+                factText.className = 'fact-text';
+            }
+
+            function setError(message) {
+                factText.innerHTML = `<span class="error">${message}</span>`;
+                factText.className = 'fact-text';
+            }
+
+            function resetButton() {
+                btn.disabled = false;
+                btn.textContent = 'Generate Another Fact';
+            }
+
+            async function getFact() {
+                setLoading();
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+                try {
+                    const response = await fetch(API_URL, { signal: controller.signal });
+
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (!data || typeof data.fact !== 'string') {
+                        throw new Error('Unexpected response format from API');
+                    }
+
+                    setFact(data.fact);
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        setError('Request timed out. Please try again.');
+                    } else {
+                        setError('Could not fetch fact. Check your API endpoint!');
+                    }
+                    console.error('Fetch error:', error);
+                } finally {
+                    clearTimeout(timeoutId);
+                    resetButton();
+                }
+            }
+
+            btn.addEventListener('click', getFact);
+        })();
+    </script>
+</body>
+
+</html>

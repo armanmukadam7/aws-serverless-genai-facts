@@ -5,6 +5,9 @@
 *.tfstate
 *.tfstate.*
 
+.env
+*.env
+infrastructure/terraform/.env
 # Crash log files
 crash.log
 crash.*.log
@@ -42,3 +45,10 @@ terraform.rc
 # Optional: ignore plan files saved before destroying Terraform configuration
 # Uncomment the line below if you want to ignore planout files.
 # planout
+
+# Python
+__pycache__/
+*.pyc
+
+# Generated Lambda package
+*.zip
