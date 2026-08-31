@@ -39,8 +39,6 @@ As an infrastructure project, this architecture was designed with the following 
 
 ## 🚀 Deployment Instructions
 
-*(Briefly explain how someone else could deploy this. Mention that the original deployment was done via the AWS Management Console.)*
-
 1. Create a DynamoDB table named `CloudFacts` with Partition Key `FactID` (String).
 2. Create a Lambda function (Python 3.13) and attach the provided code in `/backend`.
 3. Ensure Bedrock model access for Claude 3.5 Sonnet is enabled in your region.
